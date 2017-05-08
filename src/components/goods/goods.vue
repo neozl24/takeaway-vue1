@@ -1,17 +1,17 @@
 <template lang="html">
     <div class="goods">
-        <div class="menu-wrapper" v-el:food-wrapper>
+        <div class="menu-wrapper" v-el:menu-wrapper>
             <ul>
-                <li v-for="item in goods" class="menu-item">
+                <li v-for="item in goods" class="menu-item" :class="{'current':currentIndex===$index}" @click="selectMenu($index, $event)">
                     <span class="text border-1px">
                         <span v-show="item.type > 0" class="icon" :class="classMap[item.type]"></span><span>{{item.name}}</span>
                     </span>
                 </li>
             </ul>
         </div>
-        <div class="foods-wrapper">
+        <div class="foods-wrapper" v-el:foods-wrapper>
             <ul>
-                <li v-for="item in goods" class="food-list">
+                <li v-for="item in goods" class="food-list food-list-hook">
                     <h1 class="title">{{item.name}}</h1>
                     <ul>
                         <li v-for="food in item.foods" class="food-item border-1px">
@@ -33,11 +33,13 @@
                 </li>
             </ul>
         </div>
+        <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
     import BScroll from 'better-scroll';
+    import shopcart from 'components/shopcart/shopcart.vue';
 
     const ERR_OK = 0;
 
@@ -49,22 +51,71 @@
         },
         data() {
             return {
-                goods: []
+                goods: [],
+                listHeight: [],
+                scrollY: 0
             };
+        },
+        computed: {
+            currentIndex() {
+                var index = 0;
+                for (let i = 0; i < this.listHeight.length; i++) {
+                    if (this.scrollY >= this.listHeight[i]) {
+                        index = i;
+                    }
+                }
+                return index;
+            }
         },
         created() {
             this.$http.get('/api/goods').then((response) => {
                 response = response.body;
                 if (response.errno === ERR_OK) {
                     this.goods = response.data;
+                    this.$nextTick(() => {
+                        this._initScroll();
+                        this._calculateHeight();
+                    });
                 }
             });
             this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
         },
         methods: {
+            selectMenu(index, event) {
+                if (!event._constructed) {
+                    return;
+                }
+                let foodList = this.$els.foodsWrapper.getElementsByClassName('food-list-hook');
+                let el = foodList[index];
+                this.foodScroll.scrollToElement(el, 300);
+                this.scrollY = this.listHeight[index];
+            },
             _initScroll() {
-                this.menuScroll = new BScroll(this.$els.foodWrapper);
+                this.menuScroll = new BScroll(this.$els.menuWrapper, {
+                    click: true
+                });
+
+                this.foodScroll = new BScroll(this.$els.foodsWrapper, {
+                    probeType: 3
+                });
+
+                this.foodScroll.on('scroll', (pos) => {
+                    this.scrollY = Math.abs(Math.round(pos.y));
+                });
+            },
+            _calculateHeight() {
+                let foodList = this.$els.foodsWrapper.getElementsByClassName('food-list-hook');
+                let height = 0;
+                this.listHeight.push(height);
+                for (var i = 0; i < foodList.length; i++) {
+                    var item = foodList[i];
+                    height += item.clientHeight;
+                    this.listHeight.push(height);
+                }
             }
+        },
+        components: {
+            shopcart: shopcart
         }
     };
 </script>
@@ -89,6 +140,14 @@
                 width: 56px
                 padding: 0 12px
                 line-height: 14px
+                &.current
+                    position: relative
+                    margin-top: -1px
+                    z-index: 10
+                    background-color: #fff
+                    font-weight: 700
+                    .text
+                        border-none()
                 .text
                     display: table-cell
                     width: 56px
@@ -149,6 +208,7 @@
                         color: rgb(147, 153, 159)
                     .desc
                         margin-bottom: 8px
+                        line-height: 14px
                     .extra
                         .count
                             margin-right: 12px
