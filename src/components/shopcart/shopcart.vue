@@ -196,9 +196,8 @@ export default {
         }
       },
       enter(el) {
-        console.log('enter');
         /* eslint-disable no-unused-vars */
-        /* 为了强制reflow */
+        /* 下面这行为了强制reflow，因为要读取el的坐标 */
         let rf = el.offsetHeight;
         this.$nextTick(() => {
           el.style.webkitTransform = 'translate3d(0,0,0)';
@@ -209,6 +208,7 @@ export default {
         });
       },
       afterEnter(el) {
+        console.log(el.getBoundingClientRect().top);
         let ball = this.dropBalls.shift();
         if (ball) {
           ball.show = false;
