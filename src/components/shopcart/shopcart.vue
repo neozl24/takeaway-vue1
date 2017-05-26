@@ -1,28 +1,30 @@
-<template lang="html">
+<template>
   <div class="shopcart">
     <div class="content" @click="toggleList">
       <div class="content-left">
         <div class="logo-wrapper">
-          <div class="logo" :class="{'highlight': totalCount > 0}">
-            <i class="icon-shopping_cart" :class="{'highlight': totalCount > 0}"></i>
+          <div class="logo" :class="{'highlight':totalCount>0}">
+            <i class="icon-shopping_cart" :class="{'highlight':totalCount>0}"></i>
           </div>
-          <div class="num" v-show="totalCount > 0">{{totalCount}}</div>
+          <div class="num" v-show="totalCount>0">{{totalCount}}</div>
         </div>
-        <div class="price" :class="{'highlight': totalCount > 0}">¥{{totalPrice}}元</div>
-        <div class="desc">另需配送费¥{{deliveryPrice}}</div>
+        <div class="price" :class="{'highlight':totalPrice>0}">￥{{totalPrice}}</div>
+        <div class="desc">另需配送费￥{{deliveryPrice}}元</div>
       </div>
       <div class="content-right" @click.stop.prevent="pay">
-        <div class="pay" :class="payClass">{{payDesc}}</div>
+        <div class="pay" :class="payClass">
+          {{payDesc}}
+        </div>
       </div>
     </div>
     <div class="ball-container">
-      <div class="ball" v-for="ball in balls" v-show="ball.show" transition="drop">
+      <div transition="drop" v-for="ball in balls" v-show="ball.show" class="ball">
         <div class="inner inner-hook"></div>
       </div>
     </div>
     <div class="shopcart-list" v-show="listShow" transition="fold">
       <div class="list-header">
-        <span class="title">购物车</span>
+        <h1 class="title">购物车</h1>
         <span class="empty" @click="empty">清空</span>
       </div>
       <div class="list-content" v-el:list-content>
@@ -30,7 +32,7 @@
           <li class="food" v-for="food in selectFoods">
             <span class="name">{{food.name}}</span>
             <div class="price">
-              <span>¥{{food.price*food.count}}</span>
+              <span>￥{{food.price*food.count}}</span>
             </div>
             <div class="cartcontrol-wrapper">
               <cartcontrol :food="food"></cartcontrol>
@@ -156,7 +158,6 @@ export default {
         beforeEnter(el) {
           /* eslint-disable no-unused-vars */
           let count = this.balls.length;
-          console.log(3);
           while (count--) {
             let ball = this.balls[count];
             if (ball.show) {
@@ -165,7 +166,7 @@ export default {
               let y = -(window.innerHeight - rect.top - 22);
               el.style.display = '';
               el.style.webkitTransform = `translate3d(0,${y}px,0)`;
-              el.style.transform = `translate3d{0,${y}px,0}`;
+              el.style.transform = `translate3d(0,${y}px,0)`;
               let inner = el.getElementsByClassName('inner-hook')[0];
               inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
               inner.style.transform = `translate3d(${x}px,0,0)`;
