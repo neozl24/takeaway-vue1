@@ -208,7 +208,6 @@ export default {
         });
       },
       afterEnter(el) {
-        console.log(el.getBoundingClientRect().top);
         let ball = this.dropBalls.shift();
         if (ball) {
           ball.show = false;
