@@ -71,26 +71,15 @@ export default {
   },
   data() {
     return {
-      balls: [
-        {
-          show: false
-        },
-        {
-          show: false
-        },
-        {
-          show: false
-        },
-        {
-          show: false
-        },
-        {
-          show: false
-        }
-      ],
+      balls: [],
       dropBalls: [],
       fold: true
     };
+  },
+  created() {
+    for (var i = 0; i < 10; i++) {
+      this.balls.push({show: false});
+    }
   },
   computed: {
     totalPrice() {
