@@ -16,18 +16,27 @@
         <div class="price">
           <span class="now">¥{{food.price}}</span><span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
         </div>
+        <div class="cartcontrol-wrapper">
+          <cartcontrol :food="food"></cartcontrol>
+        </div>
+        <div @click.stop.prevent="addFirst($event)" class="buy" v-show="!food.count || food.count===0" transition="fade">
+          加入购物车
+        </div>
       </div>
-      <div class="cartcontrol-wrapper">
-        <cartcontrol :food="food"></cartcontrol>
+      <split v-show="food.info"></split>
+      <div class="info" v-show="food.info">
+        <h1 class="title">商品信息</h1>
+        <p class="text">{{food.info}}</p>
       </div>
-      <div class="buy" v-show="!food.count||food.count===0">加入购物车</div>
     </div>
   </div>
 </template>
 
 <script>
 import BScroll from 'better-scroll';
+import Vue from 'vue';
 import cartcontrol from 'components/cartcontrol/cartcontrol';
+import split from 'components/split/split';
 
 export default {
   props: {
@@ -55,10 +64,21 @@ export default {
     },
     hide() {
       this.showFlag = false;
+    },
+    addFirst(event) {
+      // 第一步依然是防止PC端一次点击算作多次点击
+      if (!event._constructed) {
+        return;
+      }
+      Vue.set(this.food, 'count', 1);
+
+      // 有了下面这行才有抛物线小球端动画
+      this.$dispatch('cart.add', event.target);
     }
   },
   components: {
-    cartcontrol
+    cartcontrol,
+    split
   }
 };
 </script>
@@ -99,6 +119,7 @@ export default {
           color: #fff
           -webkit-text-stroke: 1px #666
     .content
+      position: relative
       padding: 18px
       .title
         line-height: 14px
@@ -126,20 +147,37 @@ export default {
           text-decoration: line-through
           font-size: 10px
           color: rgb(147,153,159)
-    .cartcontrol-wrapper
-      position: absolute
-      right: 12px
-      bottom: 12px
-    .buy
-      position: absolute
-      right: 18px
-      bottom: 18px
-      z-index: 10
-      height: 24px
-      line-height: 24px
-      padding: 0 12px
-      font-size: 10px
-      border-radius: 12px
-      color: #fff
-      background-color: rgb(0,160,220)
+      .cartcontrol-wrapper
+        position: absolute
+        right: 12px
+        bottom: 12px
+      .buy
+        position: absolute
+        right: 18px
+        bottom: 18px
+        z-index: 10
+        height: 24px
+        line-height: 24px
+        padding: 0 12px
+        font-size: 10px
+        border-radius: 12px
+        color: #fff
+        background-color: rgb(0,160,220)
+        &.fade-transition
+          transition: all 0.2s
+          opacity: 1
+        &.fade-enter, &.fade-leave
+          opacity: 0
+    .info
+      padding: 18px
+      .title
+        line-height: 14px
+        margin-bottom: 6px
+        font-size: 14px
+        color: rgb(7, 17, 27)
+      .text
+        line-height: 24px
+        padding: 0 8px
+        font-size: 12px
+        color: rgb(77, 85, 93)
 </style>
