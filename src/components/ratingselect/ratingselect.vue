@@ -105,7 +105,7 @@ export default {
         color: #fff
       .count
         margin-left: 2px
-        font-size: 8px
+        font-size: 10px
       &.positive
         background-color: rgba(0,160,220,0.2)
         &.active
