@@ -30,6 +30,8 @@
 
 <script type="text/ecmascript-6">
   import star from 'components/star/star';
+  import ratingselect from 'components/ratingselect/ratingselect';
+  import split from 'components/split/split';
 
   export default {
     props: {
@@ -38,7 +40,9 @@
       }
     },
     components: {
-      star
+      star,
+      split,
+      ratingselect
     }
   };
 </script>
